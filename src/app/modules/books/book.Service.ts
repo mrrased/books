@@ -93,7 +93,26 @@ const getAllBook = async (
   };
 };
 
+const getSingleBook = async (id: string): Promise<IBook | null> => {
+  const result = await Book.findById(id);
+
+  return result;
+};
+
+const updateBook = async (
+  id: string,
+  payload: Partial<IBookFilters>
+): Promise<IBook | null> => {
+  const result = await Book.findOneAndUpdate({ _id: id }, payload, {
+    new: true,
+  });
+
+  return result;
+};
+
 export const BookService = {
   craeteBook,
   getAllBook,
+  getSingleBook,
+  updateBook,
 };
