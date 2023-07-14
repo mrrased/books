@@ -23,8 +23,6 @@ const getAllBook = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, BookFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
 
-  console.log(filters);
-
   const result = await BookService.getAllBook(filters, paginationOptions);
 
   sendResponse<IBook[]>(res, {
@@ -36,7 +34,22 @@ const getAllBook = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateBook = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const updatedData = req.body;
+
+  const result = await BookService.updateBook(id, updatedData);
+
+  sendResponse<IBook>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Cow updated successfully',
+    data: result,
+  });
+});
+
 export const BookController = {
   createBook,
   getAllBook,
+  updateBook,
 };
