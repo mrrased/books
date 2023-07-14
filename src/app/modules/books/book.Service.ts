@@ -20,32 +20,40 @@ const getAllBook = async (
   filters: Partial<IBookFilters>,
   paginationOptions: Partial<IPaginationOPtions>
 ): Promise<IGenericResponse<IBook[]>> => {
-  const { searchTerm, ...filtersData } = filters;
+  const { title, genre, author, ...filtersData } = filters;
 
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.caculatePagination(paginationOptions);
 
   const andConditions = [];
-  if (searchTerm) {
+  if (genre) {
     andConditions.push({
       $or: BookSearchableFields.map(field => ({
         [field]: {
-          $regex: searchTerm,
+          $regex: genre,
+          $options: 'i',
+        },
+      })),
+    });
+  } else if (title) {
+    andConditions.push({
+      $or: BookSearchableFields.map(field => ({
+        [field]: {
+          $regex: title,
+          $options: 'i',
+        },
+      })),
+    });
+  } else if (author) {
+    andConditions.push({
+      $or: BookSearchableFields.map(field => ({
+        [field]: {
+          $regex: author,
           $options: 'i',
         },
       })),
     });
   }
-  // else if (title) {
-  //   andConditions.push({
-  //     $or: BookSearchableFields.map(field => ({
-  //       [field]: {
-  //         $regex: title,
-  //         $options: 'i',
-  //       },
-  //     })),
-  //   });
-  // }
 
   // if (minPrice && maxPrice) {
   //   andConditions.push({ price: { $gte: minPrice, $lte: maxPrice } });

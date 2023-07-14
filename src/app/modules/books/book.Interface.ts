@@ -12,5 +12,6 @@ export type BookModel = Model<IBook, Record<string, unknown>>;
 export type IBookFilters = {
   genre?: string;
   year?: string;
-  searchTerm?: string;
+  title?: string;
+  author?: string;
 };
