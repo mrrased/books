@@ -1,5 +1,5 @@
 import express from 'express';
-// import { UserRoutes } from '../modules/users/user,route';
+import { UserRoutes } from '../modules/users/user,route';
 // import { CowRoutes } from '../modules/cows/cow.Route';
 // import { OrderRoutes } from '../modules/order/order.Route';
 // import { AdminRoutes } from '../modules/admin/admin.route';
@@ -13,10 +13,10 @@ const moduleRoutes = [
   //   path: '/auth',
   //   route: UserRoutes,
   // },
-  // {
-  //   path: '/users',
-  //   route: UserRoutes,
-  // },
+  {
+    path: '/users',
+    route: UserRoutes,
+  },
   // {
   //   path: '/cows',
   //   route: CowRoutes,

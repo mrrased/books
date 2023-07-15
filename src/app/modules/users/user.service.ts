@@ -7,7 +7,7 @@ import Config from '../../../Config';
 import { jwtHelpers } from '../../../helpers/jwt.Helpers';
 import bcrypt from 'bcrypt';
 import { Book } from '../books/book.Model';
-import { IBook } from '../books/book.Interface';
+import { IBook, IReview } from '../books/book.Interface';
 
 const craeteUser = async (user: IUser): Promise<IUser | null> => {
   const createdUser = await User.create(user);
@@ -20,13 +20,9 @@ const craeteUser = async (user: IUser): Promise<IUser | null> => {
 
 const createUserReview = async (
   id: string,
-  review: Partial<IBook>
+  review: Partial<IReview>
 ): Promise<IBook | null> => {
-  // const result = await Book.updateOne(
-  //   { _id: id },
-  //   { $push: { comments: comment } }
-  // );
-
+  console.log(review);
   const result = await Book.findOneAndUpdate(
     { _id: id },
     { $push: { reviews: review } },
@@ -34,6 +30,8 @@ const createUserReview = async (
       new: true,
     }
   );
+
+  console.log(result);
 
   return result;
 };

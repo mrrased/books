@@ -15,9 +15,7 @@ const bookSchema = new Schema<IBook>(
       type: String,
       required: true,
     },
-    Reviews: {
-      type: String,
-    },
+    reviews: [String],
   },
   {
     timestamps: true,

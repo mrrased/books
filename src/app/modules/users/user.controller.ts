@@ -20,7 +20,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 
 const createUserReview = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-  const review = req.body.review;
+  const review = req.body.reviews;
   const result = await UserService.createUserReview(id, review);
 
   sendResponse(res, {

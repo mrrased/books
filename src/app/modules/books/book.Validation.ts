@@ -11,7 +11,7 @@ const createBookZodSchema = z.object({
     genre: z.string({
       required_error: 'Genre is required',
     }),
-    Reviews: z.string().optional(),
+    reviews: z.string().optional(),
   }),
 });
 
