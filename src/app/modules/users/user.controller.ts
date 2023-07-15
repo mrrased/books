@@ -18,6 +18,19 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createUserReview = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const review = req.body.review;
+  const result = await UserService.createUserReview(id, review);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Users created successfully',
+    data: result,
+  });
+});
+
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.getAllUsers();
 
@@ -116,4 +129,5 @@ export const UserController = {
   deleteUser,
   getMyProfile,
   updateProfile,
+  createUserReview,
 };

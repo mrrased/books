@@ -6,6 +6,8 @@ import { Secret } from 'jsonwebtoken';
 import Config from '../../../Config';
 import { jwtHelpers } from '../../../helpers/jwt.Helpers';
 import bcrypt from 'bcrypt';
+import { Book } from '../books/book.Model';
+import { IBook } from '../books/book.Interface';
 
 const craeteUser = async (user: IUser): Promise<IUser | null> => {
   const createdUser = await User.create(user);
@@ -14,6 +16,26 @@ const craeteUser = async (user: IUser): Promise<IUser | null> => {
     throw new ApiError(400, 'Failed to create user!');
   }
   return createdUser;
+};
+
+const createUserReview = async (
+  id: string,
+  review: Partial<IBook>
+): Promise<IBook | null> => {
+  // const result = await Book.updateOne(
+  //   { _id: id },
+  //   { $push: { comments: comment } }
+  // );
+
+  const result = await Book.findOneAndUpdate(
+    { _id: id },
+    { $push: { reviews: review } },
+    {
+      new: true,
+    }
+  );
+
+  return result;
 };
 
 const getAllUsers = async (): Promise<IUser[]> => {
@@ -141,4 +163,5 @@ export const UserService = {
   deleteUser,
   getMyProfile,
   updateProfile,
+  createUserReview,
 };

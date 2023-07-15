@@ -38,4 +38,6 @@ router.patch(
 
 router.get('/', auth(ENUM_USER_ROLE.ADMIN), UserController.getAllUsers);
 
+router.post('/review/:id', UserController.createUserReview);
+
 export const UserRoutes = router;
