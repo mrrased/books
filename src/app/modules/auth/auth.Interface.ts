@@ -5,6 +5,7 @@ export type ILoginUsersResponse = {
 
 export type ILoginUsers = {
   phoneNumber: string;
+  email: string;
   password: string;
 };
 

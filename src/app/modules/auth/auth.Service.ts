@@ -13,12 +13,12 @@ import { jwtHelpers } from '../../../helpers/jwt.Helpers';
 const loginUsers = async (
   payload: ILoginUsers
 ): Promise<ILoginUsersResponse> => {
-  const { phoneNumber, password } = payload;
+  const { email, password } = payload;
   // creating instance of User
   // const user = new User();
 
   // Access to our instance methods
-  const isUserExist = await User.isUserExist(phoneNumber);
+  const isUserExist = await User.isUserExist(email);
 
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Admin does not exist');
@@ -34,14 +34,14 @@ const loginUsers = async (
 
   //create access token & refresh token
 
-  const { role, _id, phoneNumber: userNumber } = isUserExist;
+  const { _id, email: usermail } = isUserExist;
   const accessToken = jwtHelpers.createToken(
-    { role, _id, userNumber },
+    { _id, usermail },
     Config.jwt.secret as Secret,
     Config.jwt.expires_in as string
   );
   const refreshToken = jwtHelpers.createToken(
-    { _id, role, userNumber },
+    { _id, usermail },
     Config.jwt.refresh_secret as Secret,
     Config.jwt.refresh_expires_in as string
   );

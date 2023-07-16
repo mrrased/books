@@ -36,7 +36,7 @@ router.patch(
   UserController.updateUser
 );
 
-router.get('/', auth(ENUM_USER_ROLE.ADMIN), UserController.getAllUsers);
+router.get('/review/:id', UserController.getBookReviews);
 
 router.post('/review/:id', UserController.createUserReview);
 

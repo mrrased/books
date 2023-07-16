@@ -5,6 +5,7 @@ import sendResponse from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
 import { IUser } from './user.interface';
 import ApiError from '../../../errors/ApiError';
+import { IBook } from '../books/book.Interface';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const { ...userData } = req.body;
@@ -21,6 +22,7 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 const createUserReview = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
   const review = req.body.reviews;
+
   const result = await UserService.createUserReview(id, review);
 
   sendResponse(res, {
@@ -31,13 +33,14 @@ const createUserReview = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getAllUsers = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.getAllUsers();
+const getBookReviews = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await UserService.getBookReviews(id);
 
-  sendResponse<IUser[]>(res, {
+  sendResponse<IBook>(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'get retrieved successfully',
+    message: 'Reviews retrieved successfully',
     data: result,
   });
 });
@@ -123,7 +126,7 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
 
 export const UserController = {
   createUser,
-  getAllUsers,
+  getBookReviews,
   getSingleUser,
   updateUser,
   deleteUser,

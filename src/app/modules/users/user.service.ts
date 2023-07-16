@@ -22,7 +22,6 @@ const createUserReview = async (
   id: string,
   review: Partial<IReview>
 ): Promise<IBook | null> => {
-  console.log(review);
   const result = await Book.findOneAndUpdate(
     { _id: id },
     { $push: { reviews: review } },
@@ -31,14 +30,11 @@ const createUserReview = async (
     }
   );
 
-  console.log(result);
-
   return result;
 };
 
-const getAllUsers = async (): Promise<IUser[]> => {
-  const result = await User.find({});
-
+const getBookReviews = async (_id: string): Promise<IBook | null> => {
+  const result = await Book.findById(_id, { _id: 0, reviews: 1 });
   return result;
 };
 
@@ -52,14 +48,6 @@ const updateUser = async (
   id: string,
   payload: Partial<IUser>
 ): Promise<IUser | null> => {
-  if (payload.name) {
-    if (!payload.name?.firstName) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'FirstName is required');
-    } else if (!payload.name?.lastName) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'LastName is required');
-    }
-  }
-
   if (payload.password) {
     // Hash the new password
     payload.password = await bcrypt.hash(
@@ -126,16 +114,16 @@ const updateProfile = async (
   }
 
   // Dynamically update handle
-  const { name, ...profileData } = payload;
+  const { ...profileData } = payload;
   const updateProfileData: Partial<IUser> = { ...profileData };
 
-  if (name && Object.keys(name).length > 0) {
-    Object.keys(name).forEach(key => {
-      const nameKey = `name.${key}` as keyof Partial<IUser>;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (updateProfileData as any)[nameKey] = name[key as keyof typeof name];
-    });
-  }
+  // if (name && Object.keys(name).length > 0) {
+  //   Object.keys(name).forEach(key => {
+  //     const nameKey = `name.${key}` as keyof Partial<IUser>;
+  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //     (updateProfileData as any)[nameKey] = name[key as keyof typeof name];
+  //   });
+  // }
 
   if (payload.password) {
     // Hash the new password
@@ -155,7 +143,7 @@ const updateProfile = async (
 
 export const UserService = {
   craeteUser,
-  getAllUsers,
+  getBookReviews,
   getSingleUser,
   updateUser,
   deleteUser,
