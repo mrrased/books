@@ -9,26 +9,10 @@ import { AuthRoutes } from '../modules/auth/auth.Route';
 const router = express.Router();
 
 const moduleRoutes = [
-  // {
-  //   path: '/auth',
-  //   route: UserRoutes,
-  // },
   {
     path: '/users',
     route: UserRoutes,
   },
-  // {
-  //   path: '/cows',
-  //   route: CowRoutes,
-  // },
-  // {
-  //   path: '/orders',
-  //   route: OrderRoutes,
-  // },
-  // {
-  //   path: '/admins',
-  //   route: AdminRoutes,
-  // },
   {
     path: '/auth',
     route: AuthRoutes,

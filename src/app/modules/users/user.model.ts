@@ -10,47 +10,39 @@ const userSchema = new Schema<IUser>(
       required: true,
     },
     email: {
+      unique: true,
       type: String,
       required: true,
     },
     password: {
+      unique: true,
       type: String,
       required: true,
+      select: 0,
     },
+    wishList: [{ String }],
   },
   {
     timestamps: true,
   }
 );
 
-// userSchema.statics.isUserExist = async function (
-//   phoneNumber: string,
-//   _id: string
-// ): Promise<Pick<IUser, 'phoneNumber' | 'password' | '_id'> | null> {
-//   const query: FilterQuery<IUser> = {};
-
-//   if (phoneNumber) {
-//     query['phoneNumber'] = phoneNumber;
-//   }
-
-//   if (_id) {
-//     query['_id'] = _id;
-//   }
-
-//   const selectedFields = {
-//     phoneNumber: 1,
-//     password: 1,
-//     role: 1,
-//     _id: 1,
-//   };
-
-//   return await User.findOne(query, selectedFields);
-// };
-
 userSchema.statics.isUserExist = async function (
   email: string
 ): Promise<Pick<IUser, '_id' | 'password' | 'email'> | null> {
   return await User.findOne({ email }, { _id: 1, password: 1, email: 1 });
+};
+
+userSchema.statics.isWishUserExist = async function (
+  email: string
+): Promise<Pick<IUser, '_id' | 'wishList' | 'email'> | null> {
+  return await User.findOne({ email }, { wishList: 1 });
+};
+
+userSchema.statics.isUserResponse = async function (
+  _id: string
+): Promise<Pick<IUser, '_id' | 'password' | 'email'> | null> {
+  return await User.findOne({ _id }, { password: 0 });
 };
 
 userSchema.statics.isPasswordMatched = async function (
@@ -62,8 +54,8 @@ userSchema.statics.isPasswordMatched = async function (
 
 userSchema.pre('save', async function (next) {
   // hashing user password
-  this.password = await bcrypt.hash(
-    this.password,
+  (this.password as string) = await bcrypt.hash(
+    this.password as string,
     Number(Config.bcrypt_salt_rounds)
   );
 

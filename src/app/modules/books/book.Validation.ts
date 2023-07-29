@@ -11,27 +11,19 @@ const createBookZodSchema = z.object({
     genre: z.string({
       required_error: 'Genre is required',
     }),
+    year: z.string({
+      required_error: 'Year is required',
+    }),
     reviews: z.string().optional(),
   }),
 });
 
 const updateBookZodSchema = z.object({
   body: z.object({
-    title: z
-      .string({
-        required_error: 'Title is required',
-      })
-      .optional(),
-    author: z
-      .number({
-        required_error: 'Author is required',
-      })
-      .optional(),
-    genre: z
-      .number({
-        required_error: 'Genre is required',
-      })
-      .optional(),
+    title: z.string().optional(),
+    author: z.string().optional(),
+    genre: z.string().optional(),
+    year: z.string().optional(),
   }),
 });
 

@@ -20,44 +20,23 @@ const getAllBook = async (
   filters: Partial<IBookFilters>,
   paginationOptions: Partial<IPaginationOPtions>
 ): Promise<IGenericResponse<IBook[]>> => {
-  const { title, genre, author, ...filtersData } = filters;
+  const { searchTerm, ...filtersData } = filters;
 
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.caculatePagination(paginationOptions);
 
   const andConditions = [];
-  if (genre) {
+
+  if (searchTerm) {
     andConditions.push({
       $or: BookSearchableFields.map(field => ({
         [field]: {
-          $regex: genre,
-          $options: 'i',
-        },
-      })),
-    });
-  } else if (title) {
-    andConditions.push({
-      $or: BookSearchableFields.map(field => ({
-        [field]: {
-          $regex: title,
-          $options: 'i',
-        },
-      })),
-    });
-  } else if (author) {
-    andConditions.push({
-      $or: BookSearchableFields.map(field => ({
-        [field]: {
-          $regex: author,
+          $regex: searchTerm,
           $options: 'i',
         },
       })),
     });
   }
-
-  // if (minPrice && maxPrice) {
-  //   andConditions.push({ price: { $gte: minPrice, $lte: maxPrice } });
-  // }
 
   if (Object.keys(filtersData).length) {
     andConditions.push({
@@ -83,6 +62,7 @@ const getAllBook = async (
     .limit(limit);
 
   const total = await Book.countDocuments(whereConditions);
+
   return {
     meta: {
       page,
@@ -103,7 +83,15 @@ const updateBook = async (
   id: string,
   payload: Partial<IBookFilters>
 ): Promise<IBook | null> => {
-  const result = await Book.findOneAndUpdate({ _id: id }, payload, {
+  const filteredFields: IBookFilters = {};
+
+  for (const key in payload) {
+    if (payload[key] !== '') {
+      filteredFields[key] = payload[key];
+    }
+  }
+
+  const result = await Book.findOneAndUpdate({ _id: id }, filteredFields, {
     new: true,
   });
 

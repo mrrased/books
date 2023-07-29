@@ -6,4 +6,10 @@ export const BookSearchableFields = [
   'year',
 ];
 
-export const BookFilterableFields = ['genre', 'year', 'title', 'author'];
+export const BookFilterableFields = [
+  'genre',
+  'year',
+  'title',
+  'author',
+  'searchTerm',
+];

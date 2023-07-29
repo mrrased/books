@@ -10,6 +10,7 @@ import { paginationFields } from '../../../constants/pagination';
 
 const createBook = catchAsync(async (req: Request, res: Response) => {
   const { ...bookData } = req.body;
+
   const result = await BookService.craeteBook(bookData);
   sendResponse<IBook>(res, {
     success: true,

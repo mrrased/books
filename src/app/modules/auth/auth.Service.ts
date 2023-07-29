@@ -49,6 +49,7 @@ const loginUsers = async (
   return {
     accessToken,
     refreshToken,
+    email: isUserExist.email,
   };
 };
 
@@ -75,12 +76,13 @@ const refreshToken = async (token: string): Promise<IRefreshTokenResponse> => {
   // generate new token
 
   const newAccessToken = jwtHelpers.createToken(
-    { id: isUserExist._id, role: isUserExist.role },
+    { id: isUserExist._id },
     Config.jwt.secret as Secret,
     Config.jwt.expires_in as string
   );
   return {
     accessToken: newAccessToken,
+    user: isUserExist,
   };
 };
 

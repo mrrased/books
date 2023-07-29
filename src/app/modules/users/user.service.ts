@@ -1,13 +1,9 @@
-import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
-import { IUser } from './user.interface';
+import { IUser, IWishList } from './user.interface';
 import { User } from './user.model';
-import { Secret } from 'jsonwebtoken';
-import Config from '../../../Config';
-import { jwtHelpers } from '../../../helpers/jwt.Helpers';
-import bcrypt from 'bcrypt';
 import { Book } from '../books/book.Model';
 import { IBook, IReview } from '../books/book.Interface';
+import { FilterQuery } from 'mongoose';
 
 const craeteUser = async (user: IUser): Promise<IUser | null> => {
   const createdUser = await User.create(user);
@@ -15,7 +11,10 @@ const craeteUser = async (user: IUser): Promise<IUser | null> => {
   if (!craeteUser) {
     throw new ApiError(400, 'Failed to create user!');
   }
-  return createdUser;
+
+  const { _id } = createdUser;
+  const data = await User.isUserResponse(_id);
+  return data;
 };
 
 const createUserReview = async (
@@ -33,121 +32,78 @@ const createUserReview = async (
   return result;
 };
 
+const createUserWishList = async (
+  email: string,
+  wish: Partial<IWishList>
+): Promise<IUser | null> => {
+  const result = await User.findOneAndUpdate(
+    { email: email },
+    { $push: { wishList: wish } },
+    {
+      new: true,
+    }
+  );
+
+  return result;
+};
+
 const getBookReviews = async (_id: string): Promise<IBook | null> => {
   const result = await Book.findById(_id, { _id: 0, reviews: 1 });
   return result;
 };
 
-const getSingleUser = async (id: string): Promise<IUser | null> => {
-  const result = await User.findById(id);
+const getUserWishList = async (email: string): Promise<IBook[] | null> => {
+  if (!email) {
+    throw new ApiError(400, 'Failed to create user!');
+  }
+  const filter: FilterQuery<IUser> = { email };
 
-  return result;
+  const result = await User.findOne(filter, { _id: 0, wishList: 1 });
+
+  const bookIds = result?.wishList;
+
+  // Query the 'Book' collection to get the matching book objects
+  const matchingBooks = await Book.find(
+    { _id: { $in: bookIds } },
+    { title: 1 }
+  ).lean();
+
+  return matchingBooks;
 };
 
-const updateUser = async (
-  id: string,
-  payload: Partial<IUser>
+const deleteUserWishList = async (
+  email: string,
+  data: IUser
 ): Promise<IUser | null> => {
-  if (payload.password) {
-    // Hash the new password
-    payload.password = await bcrypt.hash(
-      payload.password,
-      Number(Config.bcrypt_salt_rounds)
-    );
+  const isUserCheck = await User.isWishUserExist(email);
+
+  if (!isUserCheck) {
+    throw new ApiError(400, 'User undefined!');
   }
+  const idToDelete = data._id;
 
-  const result = await User.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-  });
-
-  return result;
-};
-
-const deleteUser = async (id: string): Promise<IUser | null> => {
-  const result = await User.findByIdAndDelete(id);
-
-  return result;
-};
-
-const getMyProfile = async (token: string): Promise<IUser | null> => {
-  let verifiedToken = null;
-
-  try {
-    verifiedToken = jwtHelpers.verifyToken(token, Config.jwt.secret as Secret);
-  } catch (err) {
-    throw new ApiError(httpStatus.FORBIDDEN, 'Invalid Token');
-  }
-
-  const { userNumber: phoneNumber, _id } = verifiedToken;
-
-  // Checking
-  const isUserExist = await User.isUserExist(phoneNumber);
-  if (!isUserExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
-  }
-  // find data
-  const userData = await User.findOne(
-    { _id },
-    { name: 1, phoneNumber: 1, address: 1, _id: 0 }
+  // Filter out the matching ID from the wishlist array
+  isUserCheck.wishList = isUserCheck?.wishList?.filter(
+    wishItem => wishItem?._id?.toString() !== idToDelete
   );
-  return userData;
-};
 
-const updateProfile = async (
-  token: string,
-  payload: Partial<IUser>
-): Promise<IUser | null> => {
-  let verifiedToken = null;
+  // Save the updated user with the modified wishlist
 
-  try {
-    verifiedToken = jwtHelpers.verifyToken(token, Config.jwt.secret as Secret);
-  } catch (err) {
-    throw new ApiError(httpStatus.FORBIDDEN, 'Invalid Token');
-  }
+  await User.findOneAndUpdate(
+    { email },
+    { $set: { wishList: isUserCheck.wishList } },
+    { new: true }
+  );
+  // const result = await User.findByIdAndDelete(id);
 
-  const { _id } = verifiedToken;
-
-  // Checking User
-  const userData = await User.findOne({ _id });
-  if (!userData) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
-  }
-
-  // Dynamically update handle
-  const { ...profileData } = payload;
-  const updateProfileData: Partial<IUser> = { ...profileData };
-
-  // if (name && Object.keys(name).length > 0) {
-  //   Object.keys(name).forEach(key => {
-  //     const nameKey = `name.${key}` as keyof Partial<IUser>;
-  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //     (updateProfileData as any)[nameKey] = name[key as keyof typeof name];
-  //   });
-  // }
-
-  if (payload.password) {
-    // Hash the new password
-    payload.password = await bcrypt.hash(
-      payload.password,
-      Number(Config.bcrypt_salt_rounds)
-    );
-  }
-
-  const result = await User.findOneAndUpdate({ _id }, updateProfileData, {
-    new: true,
-    projection: { name: 1, phoneNumber: 1, address: 1, _id: 0 },
-  });
-
-  return result;
+  return isUserCheck;
 };
 
 export const UserService = {
   craeteUser,
   getBookReviews,
-  getSingleUser,
-  updateUser,
-  deleteUser,
-  getMyProfile,
-  updateProfile,
   createUserReview,
+  createUserWishList,
+  getUserWishList,
+  deleteUserWishList,
 };

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { role } from './user.Constant';
 
 const createUserZodSchema = z.object({
   body: z.object({
@@ -15,91 +14,15 @@ const createUserZodSchema = z.object({
   }),
 });
 
-const updateUserZodSchema = z.object({
+const createUserWishListZodSchema = z.object({
   body: z.object({
-    phoneNumber: z
-      .string({
-        required_error: 'Phone Number is required',
-      })
-      .optional(),
-    role: z
-      .enum([...role] as [string, ...string[]], {
-        required_error: 'Role is required',
-      })
-      .optional(),
-    password: z
-      .string({
-        required_error: 'Password is required',
-      })
-      .optional(),
-    name: z
-      .object({
-        firstName: z
-          .string({
-            required_error: 'First name is required',
-          })
-          .optional(),
-        lastName: z
-          .string({
-            required_error: 'Last name is required',
-          })
-          .optional(),
-      })
-      .optional(),
-    address: z
-      .string({
-        required_error: 'Address is required',
-      })
-      .optional(),
-    budget: z
-      .number({
-        required_error: 'Budget is required',
-      })
-      .optional(),
-    income: z
-      .number({
-        required_error: 'Budget is required',
-      })
-      .optional(),
-  }),
-});
-
-const updateProfileZodSchema = z.object({
-  body: z.object({
-    phoneNumber: z
-      .string({
-        required_error: 'Phone Number is required',
-      })
-      .optional(),
-    password: z
-      .string({
-        required_error: 'Password is required',
-      })
-      .optional(),
-    name: z
-      .object({
-        firstName: z
-          .string({
-            required_error: 'First name is required',
-          })
-          .optional(),
-        lastName: z
-          .string({
-            required_error: 'Last name is required',
-          })
-          .optional(),
-      })
-      .optional(),
-    address: z
-      .string({
-        required_error: 'Address is required',
-      })
-      .optional(),
+    email: z.string({
+      required_error: 'email is required',
+    }),
   }),
 });
 
 export const UserValidation = {
   createUserZodSchema,
-  updateUserZodSchema,
-  updateProfileZodSchema,
+  createUserWishListZodSchema,
 };

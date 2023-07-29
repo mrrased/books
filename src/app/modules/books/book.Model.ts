@@ -15,6 +15,10 @@ const bookSchema = new Schema<IBook>(
       type: String,
       required: true,
     },
+    year: {
+      type: String,
+      required: true,
+    },
     reviews: [String],
   },
   {

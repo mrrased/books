@@ -4,7 +4,6 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import httpStatus from 'http-status';
 import { IUser } from './user.interface';
-import ApiError from '../../../errors/ApiError';
 import { IBook } from '../books/book.Interface';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
@@ -28,7 +27,21 @@ const createUserReview = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'Users created successfully',
+    message: 'Thanks For Review',
+    data: result,
+  });
+});
+
+const createUserWishList = catchAsync(async (req: Request, res: Response) => {
+  const email = req.params.id;
+  const wish = req.body.wishList;
+
+  const result = await UserService.createUserWishList(email, wish);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Thanks For Review',
     data: result,
   });
 });
@@ -45,37 +58,23 @@ const getBookReviews = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getSingleUser = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
+const getUserWishList = catchAsync(async (req: Request, res: Response) => {
+  const email = req.params.email;
+  const result = await UserService.getUserWishList(email);
 
-  const result = await UserService.getSingleUser(id);
-
-  sendResponse<IUser>(res, {
+  sendResponse<IBook[]>(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: 'single retrieved successfully',
+    message: 'Wish List retrieved successfully',
     data: result,
   });
 });
 
-const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const updatedData = req.body;
+const deleteUserWishList = catchAsync(async (req: Request, res: Response) => {
+  const email = req.params.email;
+  const deletedData = req.body;
 
-  const result = await UserService.updateUser(id, updatedData);
-
-  sendResponse<IUser>(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: 'User updated successfully',
-    data: result,
-  });
-});
-
-const deleteUser = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-
-  const result = await UserService.deleteUser(id);
+  const result = await UserService.deleteUserWishList(email, deletedData);
 
   sendResponse<IUser>(res, {
     statusCode: httpStatus.OK,
@@ -85,52 +84,11 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getMyProfile = catchAsync(async (req: Request, res: Response) => {
-  const { authorization } = req.headers;
-  if (!authorization) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      'Authorization header is missing'
-    );
-  }
-  const result = await UserService.getMyProfile(authorization);
-
-  sendResponse<IUser>(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "User's information retrieved successfully",
-    data: result,
-  });
-});
-
-const updateProfile = catchAsync(async (req: Request, res: Response) => {
-  const { authorization } = req.headers;
-  const { ...updatedData } = req.body;
-
-  if (!authorization) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
-      'Authorization header is missing'
-    );
-  }
-
-  const result = await UserService.updateProfile(authorization, updatedData);
-
-  sendResponse<IUser>(res, {
-    success: true,
-    statusCode: httpStatus.OK,
-    message: "User's information retrieved successfully",
-    data: result,
-  });
-});
-
 export const UserController = {
   createUser,
   getBookReviews,
-  getSingleUser,
-  updateUser,
-  deleteUser,
-  getMyProfile,
-  updateProfile,
   createUserReview,
+  createUserWishList,
+  getUserWishList,
+  deleteUserWishList,
 };

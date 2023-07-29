@@ -1,6 +1,7 @@
 export type ILoginUsersResponse = {
   accessToken: string;
   refreshToken?: string;
+  email: string;
 };
 
 export type ILoginUsers = {
@@ -11,4 +12,5 @@ export type ILoginUsers = {
 
 export type IRefreshTokenResponse = {
   accessToken: string;
+  user: object;
 };
